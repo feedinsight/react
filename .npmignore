@@ -1,0 +1,33 @@
+# Development
+src/dev/
+.vscode/
+.github/
+
+# Source
+src/
+
+# Config files
+.gitignore
+.prettierrc
+.eslintrc
+eslint.config.js
+vite.config.ts
+tsconfig.json
+
+# Package manager
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Tests
+__tests__/
+*.test.*
+*.spec.*
+
+# Misc
+.DS_Store
+*.log
+.env*
+
+# Keep dist
+!dist/
