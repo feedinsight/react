@@ -106,11 +106,13 @@ const Style = (theme: ThemeConfig) => `
 				color: ${theme.primary};
     			padding-right: .75rem;
 				padding-left: .75rem;
+				font-size: .875rem;
 				height: 2.5rem;
 				width: 100%;
 
 				&::placeholder {
 					color: ${theme.primary_muted};
+					font-size: .875rem;
 				}
 
 				&:focus {
@@ -135,6 +137,14 @@ const Style = (theme: ThemeConfig) => `
 				text-align: right;
 				font-size: .75rem;
 			}
+		}
+
+		.${style_key}-error {
+			color: ${theme.error};
+			margin-top: -.80rem;
+			font-size: .75rem;
+			line-height: 1rem;
+			text-align: left;
 		}
 		
 		.${style_key}-footer {
@@ -183,7 +193,9 @@ const Dialog = ({ projectId, theme = 'dark', customTheme, user, trigger }: Props
 	const service = useFeedInsight(projectId);
 
 	const [isStylesLoaded, setIsStylesLoaded] = useState<boolean>(false);
+	const [loading, setLoading] = useState<boolean>(false);
 	const [opened, setOpened] = useState<boolean>(false);
+	const [error, setError] = useState<boolean>(false);
 	const [fields, setFields] = useState({
 		email: user?.email || '',
 		name: user?.name || '',
@@ -199,20 +211,18 @@ const Dialog = ({ projectId, theme = 'dark', customTheme, user, trigger }: Props
 	};
 
 	const handleSubmit = async () => {
-		if (service.processing) return;
-
 		try {
-			await service.submit({
-				content: fields.content,
-				user: {
-					email: fields.email,
-					name: fields.name
-				}
-			});
+			setLoading(true);
+			setError(false);
+
+			await service.submit({ content: fields.content, user: { email: fields.email, name: fields.name } });
 			setFields({ email: '', name: '', content: '' });
+
 			setOpened(false);
-		} catch (error) {
-			alert('Something went wrong');
+		} catch {
+			setError(true);
+		} finally {
+			setLoading(false);
 		}
 	};
 
@@ -277,11 +287,13 @@ const Dialog = ({ projectId, theme = 'dark', customTheme, user, trigger }: Props
 							<div className={`${style_key}-textarea-count`}>{fields.content.length}/500</div>
 						</div>
 
+						{error && <div className={`${style_key}-error`}>Oops! Please try again</div>}
+
 						<div className={`${style_key}-footer`}>
 							<button onClick={() => setOpened(false)} className={`${style_key}-button ${style_key}-button-outline`}>
 								Cancel
 							</button>
-							<button className={`${style_key}-button`} disabled={!validateForm() || (service.processing as boolean)} onClick={handleSubmit}>
+							<button className={`${style_key}-button`} disabled={!validateForm() || loading} onClick={handleSubmit}>
 								Submit
 							</button>
 						</div>

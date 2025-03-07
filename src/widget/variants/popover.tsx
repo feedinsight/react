@@ -56,11 +56,13 @@ const Style = (theme: ThemeConfig) => `
 				color: ${theme.primary};
     			padding-right: .75rem;
 				padding-left: .75rem;
+				font-size: .875rem;
 				height: 2.5rem;
 				width: 100%;
 
 				&::placeholder {
 					color: ${theme.primary_muted};
+					font-size: .875rem;
 				}
 
 				&:focus {
@@ -80,11 +82,19 @@ const Style = (theme: ThemeConfig) => `
 
 			.${style_key}-textarea-count {
 				color: ${theme.primary_muted};
-				margin-top: -.2rem;
+				margin-top: -.1rem;
     			line-height: 1rem;
 				text-align: right;
 				font-size: .75rem;
 			}
+		}
+
+		.${style_key}-error {
+			color: ${theme.error};
+			margin-top: -.80rem;
+			font-size: .75rem;
+			line-height: 1rem;
+			text-align: left;
 		}
 		
 		.${style_key}-footer {
@@ -124,7 +134,9 @@ const Popover = ({ projectId, theme = 'dark', customTheme, user, trigger, align 
 
 	const [position, setPosition] = useState<{ top?: number; left?: number; transform: string; opacity: number }>({ transform: 'translate(0, 0)', opacity: 0 });
 	const [isStylesLoaded, setIsStylesLoaded] = useState<boolean>(false);
+	const [loading, setLoading] = useState<boolean>(false);
 	const [opened, setOpened] = useState<boolean>(false);
+	const [error, setError] = useState<boolean>(false);
 	const triggerRef = useRef<HTMLSpanElement>(null);
 	const popoverRef = useRef<HTMLDivElement>(null);
 	const [fields, setFields] = useState({
@@ -142,20 +154,18 @@ const Popover = ({ projectId, theme = 'dark', customTheme, user, trigger, align 
 	};
 
 	const handleSubmit = async () => {
-		if (service.processing) return;
-
 		try {
-			await service.submit({
-				content: fields.content,
-				user: {
-					email: fields.email,
-					name: fields.name
-				}
-			});
+			setLoading(true);
+			setError(false);
+
+			await service.submit({ content: fields.content, user: { email: fields.email, name: fields.name } });
 			setFields({ email: '', name: '', content: '' });
+
 			setOpened(false);
-		} catch (error) {
-			alert('Something went wrong');
+		} catch {
+			setError(true);
+		} finally {
+			setLoading(false);
 		}
 	};
 
@@ -352,10 +362,12 @@ const Popover = ({ projectId, theme = 'dark', customTheme, user, trigger, align 
 							/>
 							<div className={`${style_key}-textarea-count ${fields.content.length > 500 ? `${style_key}-textarea-count-error` : ''}`}>{fields.content.length}/500</div>
 						</div>
+
+						{error && <div className={`${style_key}-error`}>Oops! Please try again</div>}
 					</div>
 
 					<div className={`${style_key}-footer`}>
-						<button className={`${style_key}-button`} disabled={!validateForm() || (service.processing as boolean)} onClick={handleSubmit}>
+						<button className={`${style_key}-button`} disabled={!validateForm() || loading} onClick={handleSubmit}>
 							Submit
 						</button>
 					</div>

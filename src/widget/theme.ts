@@ -4,6 +4,7 @@ interface ThemeConfig {
 	primary: string;
 	rounded: string;
 	border: string;
+	error: string;
 	brand: string;
 }
 
@@ -19,6 +20,7 @@ const defaultThemes: Record<'dark' | 'light', ThemeConfig> = {
 		primary: '#fafaf9',
 		border: '#292524',
 		brand: '#ea580c',
+		error: '#f43f5e',
 		rounded: '1rem'
 	},
 	light: {
@@ -27,6 +29,7 @@ const defaultThemes: Record<'dark' | 'light', ThemeConfig> = {
 		primary: '#0c0a09',
 		border: '#e7e5e4',
 		brand: '#ea580c',
+		error: '#f43f5e',
 		rounded: '1rem'
 	}
 };
