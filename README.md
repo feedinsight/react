@@ -74,6 +74,7 @@ const customTheme = {
 		primary_muted: '#a1a1aa',
 		border: '#27272a',
 		brand: '#3b82f6',
+		error: '#f43f5e',
 		rounded: '1rem'
 	},
 	light: {
@@ -82,6 +83,7 @@ const customTheme = {
 		primary_muted: '#71717a',
 		border: '#e4e4e7',
 		brand: '#3b82f6',
+		error: '#f43f5e',
 		rounded: '1rem'
 	}
 };
