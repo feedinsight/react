@@ -14,6 +14,8 @@ export interface Props {
 		light?: Partial<ThemeConfig>;
 	};
 	trigger: React.ReactNode;
+	showPoweredBy?: boolean;
+	textareaPlaceholder?: string;
 	user?: {
 		email: string;
 		name?: string;
@@ -64,6 +66,7 @@ const Style = (theme: ThemeConfig) => `
 		height: fit-content;
 		max-width: 450px;
 		padding: 1.5rem;
+		z-index: 9999;
 		width: 100%;
 		opacity: 0;
 
@@ -149,9 +152,28 @@ const Style = (theme: ThemeConfig) => `
 		
 		.${style_key}-footer {
 			display: flex;
+			postion: relative;
 			justify-content: flex-end;
+			align-items: center;
 			margin-top: 1.5rem;
 			gap: .8rem;
+
+			.${style_key}-poweredby {
+				position: absolute;
+				color: ${theme.primary_muted};
+				font-family: inherit;
+				font-size: .78rem;
+				font-weight: 400;
+				left: 1.5rem;
+
+				a {
+					text-decoration: none;
+					color: ${theme.brand};
+					font-family: inherit;
+					font-size: .78rem;
+					font-weight: 400;
+				}
+			}
 
 			.${style_key}-button {
 				border-radius: calc(${theme.rounded} - 7.5px);
@@ -189,8 +211,13 @@ const Style = (theme: ThemeConfig) => `
 	}
 `;
 
-const Dialog = ({ projectId, theme = 'dark', customTheme, user, trigger }: Props) => {
+const Dialog = ({ projectId, theme = 'dark', customTheme, user, trigger, showPoweredBy, textareaPlaceholder = 'Your feedback...' }: Props) => {
 	const service = useFeedInsight(projectId);
+
+	const getDomainRef = () => {
+		if (typeof window === 'undefined') return '';
+		return window.location.hostname.replace('www.', '');
+	};
 
 	const [isStylesLoaded, setIsStylesLoaded] = useState<boolean>(false);
 	const [loading, setLoading] = useState<boolean>(false);
@@ -280,7 +307,7 @@ const Dialog = ({ projectId, theme = 'dark', customTheme, user, trigger }: Props
 							<textarea
 								onChange={(e) => setFields((prev) => ({ ...prev, content: e.target.value }))}
 								className={`${style_key}-field ${style_key}-textarea`}
-								placeholder="Your feedback..."
+								placeholder={textareaPlaceholder}
 								value={fields.content}
 							/>
 
@@ -290,6 +317,15 @@ const Dialog = ({ projectId, theme = 'dark', customTheme, user, trigger }: Props
 						{error && <div className={`${style_key}-error`}>Oops! Please try again</div>}
 
 						<div className={`${style_key}-footer`}>
+							{showPoweredBy && (
+								<div className={`${style_key}-poweredby`}>
+									Powered by{' '}
+									<a href={`https://feedinsight.xyz?ref=${getDomainRef()}`} target="_blank">
+										FeedInsight
+									</a>
+								</div>
+							)}
+
 							<button onClick={() => setOpened(false)} className={`${style_key}-button ${style_key}-button-outline`}>
 								Cancel
 							</button>

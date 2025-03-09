@@ -15,6 +15,8 @@ export interface Props {
 	};
 	trigger: React.ReactNode;
 	align?: 'top' | 'bottom' | 'left' | 'right';
+	showPoweredBy?: boolean;
+	textareaPlaceholder?: string;
 	user?: {
 		email: string;
 		name?: string;
@@ -99,9 +101,24 @@ const Style = (theme: ThemeConfig) => `
 		
 		.${style_key}-footer {
 			display: flex;
-			justify-content: flex-end;
+			justify-content: space-between;
+			align-items: center;
 			margin-top: 0.6rem;
 			gap: .4rem;
+
+			.${style_key}-poweredby {
+				color: ${theme.primary_muted};
+				font-family: inherit;
+				font-size: .78rem;
+				font-weight: 400;
+				a {
+					text-decoration: none;
+					color: ${theme.brand};
+					font-family: inherit;
+					font-size: .78rem;
+					font-weight: 400;
+				}
+			}
 
 			.${style_key}-button {
 				border-radius: calc(${theme.rounded} - 7.5px);
@@ -129,8 +146,13 @@ const Style = (theme: ThemeConfig) => `
 	}
 `;
 
-const Popover = ({ projectId, theme = 'dark', customTheme, user, trigger, align }: Props) => {
+const Popover = ({ projectId, theme = 'dark', customTheme, user, trigger, align, showPoweredBy, textareaPlaceholder = 'Your feedback...' }: Props) => {
 	const service = useFeedInsight(projectId);
+
+	const getDomainRef = () => {
+		if (typeof window === 'undefined') return '';
+		return window.location.hostname.replace('www.', '');
+	};
 
 	const [position, setPosition] = useState<{ top?: number; left?: number; transform: string; opacity: number }>({ transform: 'translate(0, 0)', opacity: 0 });
 	const [isStylesLoaded, setIsStylesLoaded] = useState<boolean>(false);
@@ -357,7 +379,7 @@ const Popover = ({ projectId, theme = 'dark', customTheme, user, trigger, align 
 							<textarea
 								onChange={(e) => setFields((prev) => ({ ...prev, content: e.target.value }))}
 								className={`${style_key}-field ${style_key}-textarea`}
-								placeholder="Your feedback..."
+								placeholder={textareaPlaceholder}
 								value={fields.content}
 							/>
 							<div className={`${style_key}-textarea-count ${fields.content.length > 500 ? `${style_key}-textarea-count-error` : ''}`}>{fields.content.length}/500</div>
@@ -367,6 +389,17 @@ const Popover = ({ projectId, theme = 'dark', customTheme, user, trigger, align 
 					</div>
 
 					<div className={`${style_key}-footer`}>
+						{showPoweredBy ? (
+							<div className={`${style_key}-poweredby`}>
+								Powered by{' '}
+								<a href={`https://feedinsight.xyz?ref=${getDomainRef()}`} target="_blank">
+									FeedInsight
+								</a>
+							</div>
+						) : (
+							<div></div>
+						)}
+
 						<button className={`${style_key}-button`} disabled={!validateForm() || loading} onClick={handleSubmit}>
 							Submit
 						</button>
